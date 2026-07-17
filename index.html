@@ -381,7 +381,21 @@ const hiraganaList = [
                 e.preventDefault();
                 isDrawing = false;
                 // Tidak perlu path cleanup
-            }
+            }// Fungsi untuk membunyikan huruf Jepang menggunakan Text-to-Speech bawaan HP
+function playSound(text) {
+    // Cek apakah browser mendukung Text-to-Speech
+    if ('speechSynthesis' in window) {
+        // Hentikan suara yang sedang berjalan (biar gak tumpang tindih kalau diklik cepat)
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'ja-JP'; // SETTING WAJIB: Menggunakan bahasa Jepang
+        utterance.rate = 0.8;     // Kecepatan bicara (0.8 biar agak lambat dan jelas)
+        
+        window.speechSynthesis.speak(utterance);
+    }
+}
+
 
             // ===== UI Update =====
             function updateUI() {
@@ -390,6 +404,7 @@ const hiraganaList = [
                 romajiEl.textContent = `[ ${item.romaji} ]`;
                 counterEl.textContent = repetitionCounts[currentIndex];
                 progressEl.textContent = `${currentIndex + 1}/${totalChars}`;
+                playSound(item.char);
             }
 
             // ===== Navigation =====
@@ -418,6 +433,11 @@ const hiraganaList = [
 
             // ===== Initialize =====
             function init() {
+                hiraganaCharEl.style.cursor = 'pointer'; // Bikin efek kursor tangan saat didekati
+hiraganaCharEl.addEventListener('click', function() {
+    const item = hiraganaList[currentIndex];
+    playSound(item.char);
+});
                 // Masuk ke halaman utama
                 btnContinue.addEventListener('click', function() {
                     pageIntro.classList.add('hidden');
