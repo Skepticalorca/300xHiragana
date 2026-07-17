@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>JP-Write - Latihan Menulis Hiragana</title>
+    <style>
+        /* Reset dasar */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            background: #f0f4ff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+        }
+
+        #app {
+            width: 100%;
+            max-width: 480px;
+            min-height: 100vh;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== Halaman 1: Intro ===== */
+        #page-intro {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 32px 24px;
+            background: linear-gradient(145deg, #ffe6f0, #e0f0ff, #f5e6ff);
+            text-align: center;
+        }
+
+        #page-intro.hidden {
+            display: none;
+        }
+
+        .intro-text {
+            font-size: 1.1rem;
+            line-height: 1.7;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            max-width: 400px;
+        }
+
+        .btn-continue {
+            background: #ff6b8a;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 18px 60px;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(255,107,138,0.4);
+            transition: transform 0.15s;
+            touch-action: manipulation;
+        }
+
+        .btn-continue:active {
+            transform: scale(0.96);
+        }
+
+        /* ===== Halaman 2: Kanvas Utama ===== */
+        #page-main {
+            display: none;
+            flex-direction: column;
+            flex: 1;
+            min-height: 100vh;
+            padding: 8px 12px;
+            background: #fafcff;
+        }
+
+        #page-main.active {
+            display: flex;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0 4px;
+        }
+
+        .app-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #2c3e50;
+            letter-spacing: 1px;
+        }
+
+        .progress-indicator {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #5a6b7a;
+            background: #eef2f7;
+            padding: 6px 16px;
+            border-radius: 30px;
+        }
+
+        /* Target Area */
+        .target-area {
+            text-align: center;
+            margin: 4px 0 8px;
+        }
+
+        .hiragana-char {
+            font-size: 4.5rem;
+            font-weight: 900;
+            line-height: 1.2;
+            color: #1a2633;
+        }
+
+        .romaji {
+            font-size: 1.3rem;
+            color: #6c7a8a;
+            letter-spacing: 1px;
+        }
+
+        /* Counter Area */
+        .counter-area {
+            text-align: center;
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #3b5064;
+            margin-bottom: 6px;
+        }
+
+        .counter-area span {
+            background: #e9eff6;
+            padding: 4px 18px;
+            border-radius: 40px;
+        }
+
+        /* Canvas Container */
+        .canvas-wrapper {
+            position: relative;
+            flex: 1;
+            min-height: 240px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 8px;
+            touch-action: none; /* mencegah scroll saat menggambar */
+        }
+
+        .canvas-wrapper canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            border-radius: 20px;
+            background: white;
+            touch-action: none;
+        }
+
+        /* Control Buttons */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0 16px;
+        }
+
+        .btn-nav {
+            background: #e4e9f0;
+            border: none;
+            border-radius: 30px;
+            padding: 14px 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #2c3e50;
+            cursor: pointer;
+            flex: 1;
+            transition: background 0.1s;
+            touch-action: manipulation;
+        }
+
+        .btn-nav:active {
+            background: #cfd8e3;
+        }
+
+        .btn-delete {
+            background: #ff3b5c;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 20px 28px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            cursor: pointer;
+            flex: 2;
+            box-shadow: 0 4px 12px rgba(255,59,92,0.3);
+            transition: transform 0.1s;
+            touch-action: manipulation;
+        }
+
+        .btn-delete:active {
+            transform: scale(0.95);
+        }
+
+        /* Responsive fine-tuning */
+        @media (max-width: 360px) {
+            .hiragana-char { font-size: 3.8rem; }
+            .btn-delete { font-size: 1.4rem; padding: 18px 20px; }
+            .btn-nav { font-size: 1rem; padding: 12px 8px; }
+            .intro-text { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Halaman Intro -->
+        <div id="page-intro">
+            <p class="intro-text">
+                Tahukah kamu? Kunci utama menghafal huruf Jepang seperti Hiragana bukan cuma dilihat, tapi diresap lewat memori otot tangan. Metode terbaik adalah dengan menulis dan mengulang hingga 300x per huruf. Aplikasi ini hadir sebagai kanvas tanpa batas digital kamu untuk menghemat kertas dan resource. Mari mulai repetisi menulismu secara efisien!
+            </p>
+            <button id="btn-continue" class="btn-continue">CONTINUE</button>
+        </div>
+
+        <!-- Halaman Kanvas Utama -->
+        <div id="page-main">
+            <div class="header">
+                <div class="app-title">JP-Write</div>
+                <div class="progress-indicator" id="progress">1/5</div>
+            </div>
+
+            <div class="target-area">
+                <div class="hiragana-char" id="hiragana-char">あ</div>
+                <div class="romaji" id="romaji">[ a ]</div>
+            </div>
+
+            <div class="counter-area">
+                <span>Repetisi Tulis: <span id="counter">0</span> / 300</span>
+            </div>
+
+            <div class="canvas-wrapper" id="canvas-wrapper">
+                <canvas id="draw-canvas"></canvas>
+            </div>
+
+            <div class="controls">
+                <button id="btn-prev" class="btn-nav">&lt; PREV</button>
+                <button id="btn-clear" class="btn-delete">HAPUS</button>
+                <button id="btn-next" class="btn-nav">NEXT &gt;</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // ===== Data =====
+            // ===== GANTI BAGIAN INI DI ACODE KAMU =====
+const hiraganaList = [
+    // Baris Vokal (A-I-U-E-O)
+    { char: 'あ', romaji: 'a' }, { char: 'い', romaji: 'i' }, { char: 'う', romaji: 'u' }, { char: 'え', romaji: 'e' }, { char: 'お', romaji: 'o' },
+    // Baris K (Ka-Ki-Ku-Ke-Ko)
+    { char: 'か', romaji: 'ka' }, { char: 'き', romaji: 'ki' }, { char: 'く', romaji: 'ku' }, { char: 'け', romaji: 'ke' }, { char: 'こ', romaji: 'ko' },
+    // Baris S (Sa-Shi-Su-Se-So)
+    { char: 'さ', romaji: 'sa' }, { char: 'し', romaji: 'shi' }, { char: 'す', romaji: 'su' }, { char: 'せ', romaji: 'se' }, { char: 'そ', romaji: 'so' },
+    // Baris T (Ta-Chi-Tsu-Te-To)
+    { char: 'た', romaji: 'ta' }, { char: 'ち', romaji: 'chi' }, { char: 'つ', romaji: 'tsu' }, { char: 'て', romaji: 'te' }, { char: 'と', romaji: 'to' },
+    // Baris N (Na-Ni-Nu-Ne-No)
+    { char: 'な', romaji: 'na' }, { char: 'に', romaji: 'ni' }, { char: 'ぬ', romaji: 'nu' }, { char: 'ね', romaji: 'ne' }, { char: 'の', romaji: 'no' },
+    // Baris H (Ha-Hi-Fu-He-Ho)
+    { char: 'は', romaji: 'ha' }, { char: 'ひ', romaji: 'hi' }, { char: 'ふ', romaji: 'fu' }, { char: 'へ', romaji: 'he' }, { char: 'ほ', romaji: 'ho' },
+    // Baris M (Ma-Mi-Mu-Me-Mo)
+    { char: 'ま', romaji: 'ma' }, { char: 'み', romaji: 'mi' }, { char: 'む', romaji: 'mu' }, { char: 'め', romaji: 'me' }, { char: 'も', romaji: 'mo' },
+    // Baris Y (Ya-Yu-Yo)
+    { char: 'や', romaji: 'ya' }, { char: 'ゆ', romaji: 'yu' }, { char: 'よ', romaji: 'yo' },
+    // Baris R (Ra-Ri-Ru-Re-Ro)
+    { char: 'ら', romaji: 'ra' }, { char: 'り', romaji: 'ri' }, { char: 'る', romaji: 'ru' }, { char: 'れ', romaji: 're' }, { char: 'ろ', romaji: 'ro' },
+    // Baris W & N (Wa-Wo-n)
+    { char: 'わ', romaji: 'wa' }, { char: 'を', romaji: 'wo' }, { char: 'ん', romaji: 'n' }
+];
+// ==========================================
+            const totalChars = hiraganaList.length;
+            // Array hitungan repetisi per huruf (default 0)
+            let repetitionCounts = new Array(totalChars).fill(0);
+            let currentIndex = 0; // index huruf aktif
+
+            // ===== DOM References =====
+            const pageIntro = document.getElementById('page-intro');
+            const pageMain = document.getElementById('page-main');
+            const btnContinue = document.getElementById('btn-continue');
+            const hiraganaCharEl = document.getElementById('hiragana-char');
+            const romajiEl = document.getElementById('romaji');
+            const counterEl = document.getElementById('counter');
+            const progressEl = document.getElementById('progress');
+            const canvas = document.getElementById('draw-canvas');
+            const canvasWrapper = document.getElementById('canvas-wrapper');
+            const btnPrev = document.getElementById('btn-prev');
+            const btnNext = document.getElementById('btn-next');
+            const btnClear = document.getElementById('btn-clear');
+
+            // ===== Canvas Setup =====
+            let ctx = canvas.getContext('2d');
+            let isDrawing = false;
+            let lastX = 0, lastY = 0;
+
+            // Resize canvas agar sesuai wrapper
+            function resizeCanvas() {
+                const rect = canvasWrapper.getBoundingClientRect();
+                // Menggunakan device pixel ratio untuk canvas lebih tajam (opsional)
+                const dpr = window.devicePixelRatio || 1;
+                const width = rect.width;
+                const height = rect.height;
+                canvas.width = width * dpr;
+                canvas.height = height * dpr;
+                canvas.style.width = width + 'px';
+                canvas.style.height = height + 'px';
+                ctx.scale(dpr, dpr);
+                // styling coretan
+                ctx.strokeStyle = '#1a2633';
+                ctx.lineWidth = 5;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                // isi latar putih
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            // Clear canvas (isi putih)
+            function clearCanvas() {
+                const width = canvas.width / (window.devicePixelRatio || 1);
+                const height = canvas.height / (window.devicePixelRatio || 1);
+                ctx.fillStyle = 'white';
+                ctx.fillRect(0, 0, width, height);
+            }
+
+            // ===== Drawing Functions (Touch) =====
+            function getTouchPos(e) {
+                const rect = canvas.getBoundingClientRect();
+                const touch = e.touches ? e.touches[0] : e;
+                return {
+                    x: touch.clientX - rect.left,
+                    y: touch.clientY - rect.top
+                };
+            }
+
+            function startDrawing(e) {
+                e.preventDefault();
+                const pos = getTouchPos(e);
+                isDrawing = true;
+                lastX = pos.x;
+                lastY = pos.y;
+                // Mulai path baru
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+            }
+
+            function draw(e) {
+                e.preventDefault();
+                if (!isDrawing) return;
+                const pos = getTouchPos(e);
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+                lastX = pos.x;
+                lastY = pos.y;
+            }
+
+            function stopDrawing(e) {
+                e.preventDefault();
+                isDrawing = false;
+                // Tidak perlu path cleanup
+            }
+
+            // ===== UI Update =====
+            function updateUI() {
+                const item = hiraganaList[currentIndex];
+                hiraganaCharEl.textContent = item.char;
+                romajiEl.textContent = `[ ${item.romaji} ]`;
+                counterEl.textContent = repetitionCounts[currentIndex];
+                progressEl.textContent = `${currentIndex + 1}/${totalChars}`;
+            }
+
+            // ===== Navigation =====
+            function goToPrev() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    clearCanvas();
+                    updateUI();
+                }
+            }
+
+            function goToNext() {
+                if (currentIndex < totalChars - 1) {
+                    currentIndex++;
+                    clearCanvas();
+                    updateUI();
+                }
+            }
+
+            function handleClear() {
+                // Tambah repetisi +1
+                repetitionCounts[currentIndex]++;
+                clearCanvas();
+                updateUI();
+            }
+
+            // ===== Initialize =====
+            function init() {
+                // Masuk ke halaman utama
+                btnContinue.addEventListener('click', function() {
+                    pageIntro.classList.add('hidden');
+                    pageMain.classList.add('active');
+                    // Resize canvas setelah ditampilkan
+                    setTimeout(resizeCanvas, 10);
+                });
+
+                // Resize canvas saat ukuran berubah (include rotation)
+                window.addEventListener('resize', function() {
+                    if (pageMain.classList.contains('active')) {
+                        resizeCanvas();
+                    }
+                });
+
+                // Resize juga saat halaman menjadi visible (misal layout shift)
+                // Bisa menggunakan ResizeObserver, namun cukup panggil di resize event
+
+                // Canvas touch events
+                canvas.addEventListener('touchstart', startDrawing, { passive: false });
+                canvas.addEventListener('touchmove', draw, { passive: false });
+                canvas.addEventListener('touchend', stopDrawing, { passive: false });
+                canvas.addEventListener('touchcancel', stopDrawing, { passive: false });
+                //Canvas mouse events (Untuk PC/Laptop/Mouse)
+                canvas.addEventListener('mousedown', startDrawing);
+                canvas.addEventListener('mousemove', draw);
+                window.addEventListener('mouseup', stopDrawing);
+                // Tombol kontrol
+                btnPrev.addEventListener('click', goToPrev);
+                btnNext.addEventListener('click', goToNext);
+                btnClear.addEventListener('click', handleClear);
+
+                // Inisialisasi UI dengan index 0
+                updateUI();
+
+                // Pastikan canvas sudah siap saat halaman utama pertama kali diaktifkan
+                // (resize dipanggil setelah transisi)
+            }
+
+            // Mulai
+            init();
+        })();
+    </script>
+</body>
+</html>
