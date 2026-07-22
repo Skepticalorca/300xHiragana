@@ -2,25 +2,237 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nihongo Hub | Platform Belajar Jepang</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Nihongo Master - Belajar Bahasa & Budaya Jepang</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo">NihongoHub</div>
-        <div id="streak-counter">🔥 0</div>
-    </nav>
+    <div id="app">
+        <!-- ===== SIDEBAR NAVIGATION ===== -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-logo">日本語</span>
+                <span class="sidebar-sub">Nihongo Master</span>
+            </div>
+            <div class="sidebar-menu">
+                <button class="nav-btn active" data-page="home"><span class="nav-icon">🏠</span> Beranda</button>
+                <button class="nav-btn" data-page="hiragana"><span class="nav-icon">あ</span> Hiragana</button>
+                <button class="nav-btn" data-page="katakana"><span class="nav-icon">ア</span> Katakana</button>
+                <button class="nav-btn" data-page="kanji"><span class="nav-icon">漢</span> Kanji N5</button>
+                <button class="nav-btn" data-page="quiz"><span class="nav-icon">✍</span> Kuis</button>
+                <button class="nav-btn" data-page="culture"><span class="nav-icon">🎌</span> Budaya</button>
+                <button class="nav-btn" data-page="progress"><span class="nav-icon">📊</span> Progres</button>
+            </div>
+            <div class="sidebar-streak">
+                <span>🔥 Streak: <strong id="streak-count">0</strong> hari</span>
+            </div>
+        </nav>
 
-    <main id="app-container"></main>
+        <!-- ===== OVERLAY for mobile sidebar ===== -->
+        <div id="sidebar-overlay"></div>
 
-    <nav class="bottom-nav">
-        <button onclick="router('home')">Home</button>
-        <button onclick="router('writing')">Tulis</button>
-        <button onclick="router('quiz')">Kuis</button>
-        <button onclick="router('culture')">Budaya</button>
-    </nav>
+        <!-- ===== MAIN CONTENT ===== -->
+        <main id="main-content">
 
+            <!-- ===== PAGE: HOME ===== -->
+            <section class="page active" id="page-home">
+                <div class="page-header">
+                    <button class="hamburger" id="hamburger">☰</button>
+                    <h1>Beranda</h1>
+                    <div></div>
+                </div>
+                <div class="page-body">
+                    <div class="hero-card">
+                        <h2>Selamat Datang! ようこそ!</h2>
+                        <p>Platform belajar Bahasa Jepang lengkap — tulisan, kuis, dan budaya.</p>
+                    </div>
+                    <div class="quick-stats">
+                        <div class="stat-card">
+                            <span class="stat-num" id="home-streak">0</span>
+                            <span class="stat-label">Streak Hari</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-num" id="home-quiz-score">0</span>
+                            <span class="stat-label">Skor Kuis</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-num" id="home-chars-learned">0</span>
+                            <span class="stat-label">Karakter Dipelajari</span>
+                        </div>
+                    </div>
+                    <div class="quick-modules">
+                        <h3>Mulai Belajar</h3>
+                        <div class="module-grid">
+                            <div class="module-card" data-goto="hiragana">
+                                <span class="module-emoji">あ</span>
+                                <span class="module-name">Hiragana</span>
+                                <span class="module-count">46 huruf</span>
+                            </div>
+                            <div class="module-card" data-goto="katakana">
+                                <span class="module-emoji">ア</span>
+                                <span class="module-name">Katakana</span>
+                                <span class="module-count">46 huruf</span>
+                            </div>
+                            <div class="module-card" data-goto="kanji">
+                                <span class="module-emoji">漢</span>
+                                <span class="module-name">Kanji N5</span>
+                                <span class="module-count">50 karakter</span>
+                            </div>
+                            <div class="module-card" data-goto="quiz">
+                                <span class="module-emoji">✍</span>
+                                <span class="module-name">Kuis</span>
+                                <span class="module-count">Uji kemampuan</span>
+                            </div>
+                            <div class="module-card" data-goto="culture">
+                                <span class="module-emoji">🎌</span>
+                                <span class="module-name">Budaya</span>
+                                <span class="module-count">Eksplorasi</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== PAGE: HIRAGANA / KATAKANA / KANJI (Writing Canvas) ===== -->
+            <section class="page" id="page-writing">
+                <div class="page-header">
+                    <button class="hamburger" id="hamburger-writing">☰</button>
+                    <h1 id="writing-title">Hiragana</h1>
+                    <div></div>
+                </div>
+                <div class="page-body writing-body">
+                    <!-- Module selector tabs -->
+                    <div class="writing-tabs">
+                        <button class="writing-tab active" data-wtype="hiragana">Hiragana</button>
+                        <button class="writing-tab" data-wtype="katakana">Katakana</button>
+                        <button class="writing-tab" data-wtype="kanji">Kanji N5</button>
+                    </div>
+                    <div class="target-area">
+                        <div class="target-char" id="writing-char">あ</div>
+                        <div class="target-romaji" id="writing-romaji">[ a ]</div>
+                    </div>
+                    <div class="counter-area">
+                        <span>Repetisi: <strong id="writing-counter">0</strong></span>
+                        <span id="writing-progress">1/46</span>
+                    </div>
+                    <div class="canvas-wrapper" id="canvas-wrapper">
+                        <canvas id="draw-canvas"></canvas>
+                    </div>
+                    <div class="writing-controls">
+                        <button class="btn btn-nav" id="btn-prev">◀ Sebelum</button>
+                        <button class="btn btn-danger" id="btn-clear">✕ Hapus</button>
+                        <button class="btn btn-nav" id="btn-next">Berikut ▶</button>
+                    </div>
+                    <div class="writing-extra-controls">
+                        <button class="btn btn-sm" id="btn-reset">↺ Reset Modul</button>
+                        <button class="btn btn-sm btn-success" id="btn-check">✓ Cek Progres</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== PAGE: QUIZ ===== -->
+            <section class="page" id="page-quiz">
+                <div class="page-header">
+                    <button class="hamburger" id="hamburger-quiz">☰</button>
+                    <h1>Kuis</h1>
+                    <div></div>
+                </div>
+                <div class="page-body">
+                    <div class="quiz-module-selector">
+                        <button class="quiz-mod-btn active" data-qtype="hiragana">Hiragana</button>
+                        <button class="quiz-mod-btn" data-qtype="katakana">Katakana</button>
+                        <button class="quiz-mod-btn" data-qtype="kanji">Kanji</button>
+                        <button class="quiz-mod-btn" data-qtype="mixed">Campuran</button>
+                    </div>
+                    <div id="quiz-start-screen">
+                        <div class="quiz-info">
+                            <h2>Uji Kemampuanmu!</h2>
+                            <p>10 soal pilihan ganda. Dapatkan streak untuk skor maksimal!</p>
+                            <div class="quiz-stats-bar">
+                                <span>Skor Tertinggi: <strong id="quiz-highscore">0</strong></span>
+                                <span>Streak: 🔥 <strong id="quiz-streak-display">0</strong></span>
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="btn-start-quiz">Mulai Kuis</button>
+                    </div>
+                    <div id="quiz-active-screen" class="hidden">
+                        <div class="quiz-header">
+                            <span>Soal <span id="q-num">1</span>/10</span>
+                            <span>Skor: <span id="q-score">0</span></span>
+                            <span>🔥 <span id="q-streak">0</span></span>
+                        </div>
+                        <div class="quiz-question" id="q-question">Huruf apa ini?</div>
+                        <div class="quiz-char" id="q-char">あ</div>
+                        <div class="quiz-options" id="q-options"></div>
+                        <div class="quiz-feedback hidden" id="q-feedback"></div>
+                    </div>
+                    <div id="quiz-result-screen" class="hidden">
+                        <h2>Hasil Kuis</h2>
+                        <div class="result-score" id="result-score">0/10</div>
+                        <div class="result-streak">🔥 Streak: <span id="result-streak">0</span></div>
+                        <div class="result-msg" id="result-msg">Terus berlatih!</div>
+                        <div class="result-actions">
+                            <button class="btn btn-primary" id="btn-retry">Coba Lagi</button>
+                            <button class="btn btn-nav" id="btn-quiz-home">Kembali</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== PAGE: CULTURE ===== -->
+            <section class="page" id="page-culture">
+                <div class="page-header">
+                    <button class="hamburger" id="hamburger-culture">☰</button>
+                    <h1>Eksplorasi Budaya</h1>
+                    <div></div>
+                </div>
+                <div class="page-body">
+                    <div class="culture-tabs">
+                        <button class="culture-tab active" data-ctab="etika">Etika</button>
+                        <button class="culture-tab" data-ctab="sejarah">Sejarah</button>
+                        <button class="culture-tab" data-ctab="popculture">Pop Culture</button>
+                        <button class="culture-tab" data-ctab="tradisi">Tradisi</button>
+                    </div>
+                    <div id="culture-content" class="culture-content">
+                        <!-- Dinamic content by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===== PAGE: PROGRESS ===== -->
+            <section class="page" id="page-progress">
+                <div class="page-header">
+                    <button class="hamburger" id="hamburger-progress">☰</button>
+                    <h1>Progres Belajar</h1>
+                    <div></div>
+                </div>
+                <div class="page-body">
+                    <div class="progress-stats">
+                        <div class="pstat-card">
+                            <span class="pstat-num" id="p-hiragana">0%</span>
+                            <span class="pstat-label">Hiragana</span>
+                        </div>
+                        <div class="pstat-card">
+                            <span class="pstat-num" id="p-katakana">0%</span>
+                            <span class="pstat-label">Katakana</span>
+                        </div>
+                        <div class="pstat-card">
+                            <span class="pstat-num" id="p-kanji">0%</span>
+                            <span class="pstat-label">Kanji</span>
+                        </div>
+                    </div>
+                    <div class="progress-detail">
+                        <h3>Detail Karakter</h3>
+                        <div id="progress-detail-list"></div>
+                    </div>
+                    <div class="progress-actions">
+                        <button class="btn btn-danger" id="btn-reset-all">Reset Semua Data</button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
     <script src="app.js"></script>
 </body>
 </html>
