@@ -1,0 +1,15 @@
+:root {
+    --primary: #c92a2a;
+    --bg: #f8f9fa;
+    --text: #212529;
+    --white: #ffffff;
+}
+
+body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
+.navbar { display: flex; justify-content: space-between; padding: 1rem; background: var(--white); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.bottom-nav { position: fixed; bottom: 0; width: 100%; display: flex; background: var(--white); padding: 10px; border-top: 1px solid #ddd; }
+.bottom-nav button { flex: 1; border: none; background: none; font-weight: bold; color: var(--primary); }
+
+.card { background: var(--white); padding: 20px; border-radius: 12px; margin: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+canvas { background: #fff; border: 1px solid #dee2e6; border-radius: 8px; width: 100%; touch-action: none; }
+.btn-primary { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
